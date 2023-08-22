@@ -1,0 +1,15 @@
+.idea
+.vscode
+*.swp
+*.iml
+
+.DS_Store
+
+*.out
+*.test
+go.work
+main
+
+.env*
+
+node_modules/
