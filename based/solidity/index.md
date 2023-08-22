@@ -2,7 +2,7 @@
 
 # Smart Contracts and Solidity
 
-<p><img src="./logo.svg"/>
+<p><img src="./logo.svg"/></p>
 
 Smart Contracts are coded contracts deployed onto a blockchain network. These
 contracts are immutable and transactions executed on a smart contract are
