@@ -2,7 +2,7 @@
 
 # Base
 
-<p><img src="./Base_Wordmark_Blue.svg"/>
+<p><img src="./Base_Wordmark_Blue.svg"/></p>
 
 Now that we’ve covered core features of Ethereum as well as how Solidity and
 Smart Contract development works, we can dive into learning about Base. To get

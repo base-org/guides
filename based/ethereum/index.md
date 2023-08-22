@@ -2,7 +2,7 @@
 
 # Ethereum
 
-<p><img width="61.4" height="100" src="./eth-diamond-purple.png"/>
+<p><img width="61.4" height="100" src="./eth-diamond-purple.png"/></p>
 
 Base is a layer 2 (L2) blockchain network built on top of Ethereum. In order to
 understand how the L2 rollup works, you need to have a good understanding of how

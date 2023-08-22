@@ -2,7 +2,7 @@
 
 # Blockchain Basics
 
-<p><img src="./whatisablockchain.png"/>
+<p><img src="./whatisablockchain.png"/></p>
 
 Blockchains are complex. The technology that makes them work is a result of
 decades of innovation across several disciplines. To understand how we got to

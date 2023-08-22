@@ -1,5 +1,7 @@
 # all your base are belong to you.
 
+<p><img src="./base.jpeg"/></p>
+
 This guide is intended to act as a tour of the Base ecosystem in order to help
 with technical ramping to the protocol. It is intended to be a crash course moving
 through major topics, providing links to articles and tutorials to help filter out
