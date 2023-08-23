@@ -7,13 +7,15 @@
 These are a set of guides to help build on Base. Looking forward to seeing you onchain.
 
 Builder Guides
-| Title | Description |
-| ----- | ----------- |
+
+| Title                      | Description                                             |
+| -------------------------- | ------------------------------------------------------- |
 | [Based](./based/README.md) | Learn how Base is built through technical documentation |
 
 ERC Guides
-| Title | Description |
-| ----- | ----------- |
+
+| Title                        | Description                         |
+| ---------------------------- | ----------------------------------- |
 | [6551](./erc/6551/README.md) | How to deploy a token bound account |
 
 ## Troubleshooting
