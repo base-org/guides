@@ -13,7 +13,7 @@ git clone https://github.com/base-org/guides
 **Change to the directory**
 
 ```bash
-cd guildes/bridge/native
+cd guides/bridge/native
 ```
 
 **Install the dependencies:**
