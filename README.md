@@ -20,9 +20,9 @@ ERC Guides
 
 Bridge Guides
 
-| Title                             | Description                  |
-| --------------------------------- | ---------------------------- |
-| [6551](./bridge/native/README.md) | How to bridge tokens to base |
+| Title                               | Description                  |
+| ----------------------------------- | ---------------------------- |
+| [Native](./bridge/native/README.md) | How to bridge tokens to base |
 
 ## Troubleshooting
 
