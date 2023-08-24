@@ -1,6 +1,26 @@
 # Native Bridge Examples
 
-This repository collects a couple examples of how to call the smart contracts to bridge native ETH and ERC20 tokens to Base.
+This repository collects a couple examples of how to call the smart contracts to bridge native ETH and ERC20 tokens to Base
+
+## Environment Setup
+
+**Clone this repo**
+
+```bash
+git clone https://github.com/base-org/guides
+```
+
+**Change to the directory**
+
+```bash
+cd guildes/bridge/native
+```
+
+**Install the dependencies:**
+
+```bash
+npm install
+```
 
 ## Hardhat Scripts
 
