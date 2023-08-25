@@ -82,7 +82,7 @@ Alternatively, use the [base faucet](https://coinbase.com/faucets/base-ethereum-
 **Clone this repo**
 
 ```bash
-git clone https://github.com/coinbase-samples/base-guides.git
+git clone https://github.com/base-org/guides.git
 ```
 
 **Change into the directory**
