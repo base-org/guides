@@ -2,6 +2,14 @@
 
 This repository collects a couple examples of how to call the smart contracts to bridge native ETH and ERC20 tokens to Base.
 
+## UI
+
+This is a simple example using OP SDK to bridge native ETH.
+
+[Demo](https://op-stack-bridge-example.vercel.app/)
+
+[Code](https://github.com/wilsoncusack/op-stack-bridge-example)
+
 ## Hardhat Scripts
 
 Copy secrets.json.sample to secrets.json
@@ -41,14 +49,6 @@ You bridge a token with
 ```
 npx hardhat bridgeToken --amount 0.01 --l1token 0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6 --l2token 0x4200000000000000000000000000000000000006
 ```
-
-## UI
-
-This is a simple example using OP SDK to bridge native ETH.
-
-[Demo](https://op-stack-bridge-example.vercel.app/)
-
-[Code](https://github.com/wilsoncusack/op-stack-bridge-example)
 
 ## Add your token to Base
 
