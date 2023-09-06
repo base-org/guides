@@ -193,7 +193,6 @@ task('bridge', 'Bridges ETH to base-goerli')
   .addParam('amount', 'The amount to bridge')
   .setAction(async (taskArgs) => {
     const signer = await ethers.provider.getSigner();
-    console.log('signer', signer);
 
     const bridgeContract = getL1StandardBridgeContract(signer);
 
@@ -225,7 +224,6 @@ task('bridgeToken', 'Bridges erc20 token to base-goerli')
   .addParam('l2token', 'The token address on base-goerli')
   .setAction(async (taskArgs) => {
     const signer = await ethers.provider.getSigner();
-    console.log('signer', signer);
 
     const bridgeContract = getL1StandardBridgeContract(signer);
 
@@ -279,7 +277,6 @@ task(
   .addParam('amount', 'The amount to bridge')
   .setAction(async (taskArgs) => {
     const signer = await getBaseWallet();
-    console.log('signer', signer);
 
     const messageContract = getMessageContract(signer);
 
@@ -311,10 +308,8 @@ task(
   .addParam('tx', 'The transaction hash of the withdrawal')
   .setAction(async (taskArgs) => {
     const signer = await getBaseWallet();
-    console.log('signer', signer);
 
     const l1Signer = await getL1Wallet();
-    console.log('l1Signer', l1Signer);
 
     const oracleContract = getOracleContract(l1Signer);
 
@@ -393,10 +388,8 @@ task(
   .addParam('tx', 'The transaction hash of the withdrawal')
   .setAction(async (taskArgs) => {
     const signer = await getBaseWallet();
-    console.log('signer', signer);
 
     const l1Signer = await getL1Wallet();
-    console.log('l1Signer', l1Signer);
 
     const portalContract = getPortalContract(l1Signer);
 
@@ -422,10 +415,8 @@ task(
 task('fetchWithdrawals', 'Fetchs all withdrawals').setAction(
   async (taskArgs) => {
     const signer = await getBaseWallet();
-    console.log('signer', signer);
 
     const l1Signer = await getL1Wallet();
-    console.log('l1Signer', l1Signer);
 
     const portalContract = getPortalContract(l1Signer);
 
@@ -462,13 +453,26 @@ task('fetchWithdrawals', 'Fetchs all withdrawals').setAction(
         const isProven = rawProof[0] !== HashZero;
         withdrawal.isReadyToFinalize =
           Math.floor(Date.now() / 1000) > rawProof[1] + finalizationPeriod &&
-          !isFinalized;
+          !isFinalized &&
+          isProven;
         withdrawal.isProven = isProven;
         withdrawal.isReadyToProve =
           latestBlockNumber >= receipt.blockNumber && !isFinalized && !isProven;
       }
 
       console.log('withdrawals', withdrawals);
+      const withdrawalTable = withdrawals.map((withdrawal) => ({
+        hash:
+          withdrawal.hash.substring(0, 6) +
+          '...' +
+          withdrawal.hash.substring(withdrawal.hash.length - 6),
+        value: withdrawal.value,
+        isReadyToProve: withdrawal.isReadyToProve,
+        isProven: withdrawal.isProven,
+        isReadyToFinalize: withdrawal.isReadyToFinalize,
+        isFinalized: withdrawal.isFinalized,
+      }));
+      console.table(withdrawalTable);
     } catch (e) {
       console.log('fetch withdrawals error', e);
     }
