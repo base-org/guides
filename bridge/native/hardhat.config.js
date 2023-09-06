@@ -461,7 +461,10 @@ task('fetchWithdrawals', 'Fetchs all withdrawals').setAction(
       }
 
       console.log('withdrawals', withdrawals);
-      const withdrawalTable = withdrawals.map((withdrawal) => ({
+      const sorted = withdrawals.sort((a, b) => {
+        return a.timeStamp > b.timeStamp;
+      });
+      const withdrawalTable = sorted.map((withdrawal) => ({
         hash:
           withdrawal.hash.substring(0, 6) +
           '...' +
