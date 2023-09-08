@@ -455,7 +455,7 @@ task(
   });
 
 task('fetchWithdrawals', 'Fetchs all withdrawals')
-  .addOptionalParam('full', 'Show the full address', false, types.boolean)
+  .addFlag('full', 'Show the full address')
   .setAction(async (taskArgs) => {
     const signer = await getBaseWallet();
 
