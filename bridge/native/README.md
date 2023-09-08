@@ -66,7 +66,7 @@ isReadyToProve, isProven, isReadyToFinalize, and isFinalized
 To initiate a native token withdrawal, start with
 
 ```
-npx hardhat withdrawal --amount 0.01
+npx hardhat withdraw --amount 0.01
 ```
 
 The withdrawal will enter a proposing onchain state. Once the withdrawal is proposed and messaged between layer one, the withdrawal can be verified.
@@ -81,6 +81,12 @@ Lastly, you can finalize the transaction with
 
 ```
 npx hardhat finalizeWithdrawal --tx {your transaction hash from above}
+```
+
+The same flow can be used for ERC20 tokens. Make sure that the token is supported by the bridge by checking the l2 base, base-goerli addresses and l1 address ethereum, goerli addresses in the [optimism token list](https://github.com/ethereum-optimism/ethereum-optimism.github.io)
+
+```
+npx hardhat withdrawalToken --amount 0.01 --token 0x4200000000000000000000000000000000000006
 ```
 
 ## Add your token to Base

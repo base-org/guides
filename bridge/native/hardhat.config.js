@@ -31,7 +31,7 @@ require('@nomicfoundation/hardhat-ethers');
 
 const l2ExplorerApi = 'https://base-goerli.blockscout.com/api';
 const l1StandardBridge = '0xfA6D8Ee5BE770F84FC001D098C4bD604Fe01284a';
-const l2Bridge = '0x4200000000000000000000000000000000000010';
+const l2StandardBridge = '0x4200000000000000000000000000000000000010';
 const l2ToL1MessagePasser = '0x4200000000000000000000000000000000000016';
 const l2OutputOracle = '0x2A35891ff30313CcFa6CE88dcf3858bb075A2298';
 const optimismPortal = '0xe93c8cD0D409341205A592f8c4Ac1A5fe5585cfA';
@@ -45,7 +45,7 @@ const getBaseWallet = () => {
 
   // Create a provider using the wallet
   const provider = new ethers.JsonRpcProvider(
-    hreConfig.networks['base-goerli'].url
+    hreConfig.networks['base-goerli'].url,
   ); // Replace with your Infura Project ID or your preferred Ethereum node URL
 
   // Set the provider for the wallet
@@ -71,7 +71,7 @@ const getPortalContract = (signer) => {
   const portalContract = new ethers.Contract(
     optimismPortal,
     optimismPortalAbi,
-    signer
+    signer,
   );
   return portalContract;
 };
@@ -80,7 +80,7 @@ const getOracleContract = (signer) => {
   const oracleContract = new ethers.Contract(
     l2OutputOracle,
     l2OuputOracleAbi,
-    signer
+    signer,
   );
   return oracleContract;
 };
@@ -89,7 +89,7 @@ const getMessageContract = (signer) => {
   const messageContract = new ethers.Contract(
     l2ToL1MessagePasser,
     l2Tol1MessagePasserAbi,
-    signer
+    signer,
   );
   return messageContract;
 };
@@ -98,9 +98,23 @@ const getL1StandardBridgeContract = (signer) => {
   const bridgeContract = new ethers.Contract(
     l1StandardBridge,
     l1BridgeAbi,
-    signer
+    signer,
   );
   return bridgeContract;
+};
+
+const getL2StandardBridgeContract = (signer) => {
+  const bridgeContract = new ethers.Contract(
+    l2StandardBridge,
+    l2BridgeAbi,
+    signer,
+  );
+  return bridgeContract;
+};
+
+const getTokenContract = (signer, address) => {
+  const tokenContract = new ethers.Contract(address, tokenAbi, signer);
+  return tokenContract;
 };
 
 const makeStateTrieProof = async (provider, blockNumber, address, slot) => {
@@ -138,8 +152,8 @@ const hashWithdrawal = (withdrawalMessage) => {
   return keccak256(encoded);
 };
 
-const getWithdrawalMessage = async (messageContract, withdrawal) => {
-  const messageLog = withdrawal.logs.find((log) => {
+const getWithdrawalMessage = async (messageContract, withdrawal, isToken) => {
+  let messageLog = withdrawal.logs.find((log) => {
     if (log.address === l2ToL1MessagePasser) {
       const parsed = messageContract.interface.parseLog(log);
       console.log('parsed', parsed);
@@ -149,7 +163,11 @@ const getWithdrawalMessage = async (messageContract, withdrawal) => {
   });
   console.log('messageLog', messageLog);
 
+  if (!messageLog) {
+    messageLog = withdrawal.logs[0];
+  }
   const parsedLog = messageContract.interface.parseLog(messageLog);
+
   const withdrawalMessage = {
     nonce: parsedLog.args.nonce,
     sender: parsedLog.args.sender,
@@ -208,7 +226,7 @@ task('bridge', 'Bridges ETH to base-goerli')
         emptyData,
         {
           value: fmtAmount,
-        }
+        },
       );
       console.log('bridgeResult', bridgeResult);
       const transactionReceipt = await bridgeResult.wait();
@@ -233,22 +251,18 @@ task('bridgeToken', 'Bridges erc20 token to base-goerli')
     const fmtAmount = ethers.parseUnits(taskArgs.amount);
     console.log('fmtAmount', fmtAmount);
 
-    const tokenContract = new ethers.Contract(
-      taskArgs.l1token,
-      tokenAbi,
-      signer
-    );
+    const tokenContract = getTokenContract(signer, taskArgs.l1token);
 
     try {
       const allowance = await tokenContract.allowance(
         await signer.getAddress(),
-        l1StandardBridge
+        l1StandardBridge,
       );
       if (allowance < fmtAmount) {
         console.log('approve bridge to access token');
         const approveResult = await tokenContract.approve(
           l1StandardBridge,
-          fmtAmount
+          fmtAmount,
         );
         console.log('approve result', approveResult);
       } else {
@@ -260,7 +274,7 @@ task('bridgeToken', 'Bridges erc20 token to base-goerli')
         taskArgs.l2token,
         fmtAmount,
         defaultGasAmount,
-        emptyData
+        emptyData,
       );
       console.log('bridge token result', bridgeResult);
       const transactionReceipt = await bridgeResult.wait();
@@ -271,8 +285,8 @@ task('bridgeToken', 'Bridges erc20 token to base-goerli')
   });
 
 task(
-  'withdrawal',
-  'Initiates a native token withdrawal from base-goerli to goerli'
+  'withdraw',
+  'Initiates a native token withdrawal from base-goerli to goerli',
 )
   .addParam('amount', 'The amount to bridge')
   .setAction(async (taskArgs) => {
@@ -291,7 +305,36 @@ task(
         signer.address,
         defaultGasAmount,
         emptyData,
-        { value: fmtAmount }
+        { value: fmtAmount },
+      );
+      console.log('withdrawal result', bridgeResult);
+      const transactionReceipt = await bridgeResult.wait();
+      console.log('withdrawal transaction receipt', transactionReceipt);
+    } catch (e) {
+      console.log('withdrawal error', e);
+    }
+  });
+
+task(
+  'withdrawToken',
+  'Initiates a native token withdrawal from base-goerli to goerli',
+)
+  .addParam('amount', 'The amount to bridge')
+  .addParam('token', 'The token address on base-goerli')
+  .setAction(async (taskArgs) => {
+    const signer = await getBaseWallet();
+
+    const l2StandardBridgeContract = getL2StandardBridgeContract(signer);
+
+    const fmtAmount = ethers.parseUnits(taskArgs.amount);
+    console.log('fmtAmount', fmtAmount);
+
+    try {
+      const bridgeResult = await l2StandardBridgeContract.withdraw(
+        taskArgs.token,
+        fmtAmount,
+        defaultGasAmount,
+        '0x01',
       );
       console.log('withdrawal result', bridgeResult);
       const transactionReceipt = await bridgeResult.wait();
@@ -303,7 +346,7 @@ task(
 
 task(
   'proveWithdrawal',
-  'Proves a native token withdrawal from base-goerli to goerli'
+  'Proves a native token withdrawal from base-goerli to goerli',
 )
   .addParam('tx', 'The transaction hash of the withdrawal')
   .setAction(async (taskArgs) => {
@@ -321,7 +364,7 @@ task(
     console.log('withdrawal receipt', withdrawal.blockNumber, withdrawal);
 
     const l2OutputIdx = await oracleContract.getL2OutputIndexAfter(
-      withdrawal.blockNumber
+      withdrawal.blockNumber,
     );
     console.log('l2OutputIdx', l2OutputIdx);
 
@@ -330,7 +373,7 @@ task(
 
     const withdrawalMessage = await getWithdrawalMessage(
       messageContract,
-      withdrawal
+      withdrawal,
     );
 
     const hashedWithdrawal = hashWithdrawal(withdrawalMessage);
@@ -338,8 +381,8 @@ task(
     const messageSlot = keccak256(
       defaultAbiCoder.encode(
         ['bytes32', 'uint256'],
-        [hashedWithdrawal, HashZero]
-      )
+        [hashedWithdrawal, HashZero],
+      ),
     );
 
     const l2BlockNumber = '0x' + BigInt(l2Output[2]).toString(16);
@@ -348,7 +391,7 @@ task(
       signer.provider,
       l2BlockNumber,
       l2ToL1MessagePasser,
-      messageSlot
+      messageSlot,
     );
     console.log('proof', proof);
 
@@ -371,7 +414,7 @@ task(
         withdrawalMessage,
         l2OutputIdx,
         outputProof,
-        proof.storageProof
+        proof.storageProof,
       );
       console.log('proving', proving);
       const result = await proving.wait();
@@ -383,7 +426,7 @@ task(
 
 task(
   'finalizeWithdrawal',
-  'Finalizes a native token withdrawal from base-goerli to goerli'
+  'Finalizes a native token withdrawal from base-goerli to goerli',
 )
   .addParam('tx', 'The transaction hash of the withdrawal')
   .setAction(async (taskArgs) => {
@@ -401,9 +444,8 @@ task(
     const msg = await getWithdrawalMessage(messageContract, withdrawal);
     console.log('msg', msg);
     try {
-      const finalizing = await portalContract.finalizeWithdrawalTransaction(
-        msg
-      );
+      const finalizing =
+        await portalContract.finalizeWithdrawalTransaction(msg);
       console.log('finalizing', finalizing);
       const result = await finalizing.wait();
       console.log('finalizing result', result);
@@ -412,8 +454,9 @@ task(
     }
   });
 
-task('fetchWithdrawals', 'Fetchs all withdrawals').setAction(
-  async (taskArgs) => {
+task('fetchWithdrawals', 'Fetchs all withdrawals')
+  .addOptionalParam('full', 'Show the full address', false, types.boolean)
+  .setAction(async (taskArgs) => {
     const signer = await getBaseWallet();
 
     const l1Signer = await getL1Wallet();
@@ -424,14 +467,41 @@ task('fetchWithdrawals', 'Fetchs all withdrawals').setAction(
 
     const oracleContract = getOracleContract(l1Signer);
 
+    const l2StandardBridgeContract = getL2StandardBridgeContract(signer);
+
     try {
       const data = await fetchTransactions(await signer.getAddress());
-      const withdrawals = data.result.filter((tx) => {
-        if (tx.isError === '1') return false;
-        if (tx.to === l2ToL1MessagePasser && tx.value !== '0') return true;
-        if (tx.to === optimismPortal && tx.value !== '0') return true;
-        return false;
-      });
+      const withdrawals = [];
+      for (let i = 0; i < data.result.length; i++) {
+        const tx = data.result[i];
+        console.log(i, tx);
+        if (tx.isError === '1') continue;
+        if (tx.to === l2ToL1MessagePasser && tx.value !== '0')
+          withdrawals.push(tx);
+        if (tx.to === optimismPortal && tx.value !== '0') withdrawals.push(tx);
+        if (tx.to === l2StandardBridge) {
+          const functionName = l2StandardBridgeContract.interface.getFunction(
+            tx.input.slice(0, 10),
+          ).name;
+          console.log('functionName', functionName);
+          if (functionName === 'withdraw') {
+            const decodedWithdrawData =
+              l2StandardBridgeContract.interface.decodeFunctionData(
+                tx.input.slice(0, 10),
+                tx.input,
+              );
+            tx.value = decodedWithdrawData[1].toString();
+
+            const tokenDetails = getTokenContract(
+              signer,
+              decodedWithdrawData[0],
+            );
+            tx.symbol = await tokenDetails.symbol();
+
+            withdrawals.push(tx);
+          }
+        }
+      }
       console.log('raw transactions', withdrawals);
 
       const latestBlockNumber = await oracleContract.latestBlockNumber();
@@ -440,7 +510,7 @@ task('fetchWithdrawals', 'Fetchs all withdrawals').setAction(
       for (let i = 0; i < withdrawals.length; i++) {
         const withdrawal = withdrawals[i];
         const receipt = await signer.provider.getTransactionReceipt(
-          withdrawal.hash
+          withdrawal.hash,
         );
         console.log('receipt', receipt);
         const wm = await getWithdrawalMessage(messageContract, receipt);
@@ -465,10 +535,12 @@ task('fetchWithdrawals', 'Fetchs all withdrawals').setAction(
         return a.timeStamp > b.timeStamp;
       });
       const withdrawalTable = sorted.map((withdrawal) => ({
-        hash:
-          withdrawal.hash.substring(0, 6) +
-          '...' +
-          withdrawal.hash.substring(withdrawal.hash.length - 6),
+        hash: taskArgs.full
+          ? withdrawal.hash
+          : withdrawal.hash.substring(0, 6) +
+            '...' +
+            withdrawal.hash.substring(withdrawal.hash.length - 6),
+        symbol: withdrawal.symbol || 'ETH',
         value: withdrawal.value,
         isReadyToProve: withdrawal.isReadyToProve,
         isProven: withdrawal.isProven,
@@ -479,8 +551,7 @@ task('fetchWithdrawals', 'Fetchs all withdrawals').setAction(
     } catch (e) {
       console.log('fetch withdrawals error', e);
     }
-  }
-);
+  });
 
 /** @type import('hardhat/config').HardhatUserConfig */
 const hreConfig = {
