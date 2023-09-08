@@ -46,7 +46,7 @@ const getBaseWallet = () => {
   // Create a provider using the wallet
   const provider = new ethers.JsonRpcProvider(
     hreConfig.networks['base-goerli'].url,
-  ); // Replace with your Infura Project ID or your preferred Ethereum node URL
+  );
 
   // Set the provider for the wallet
   const signer = wallet.connect(provider);
@@ -59,7 +59,7 @@ const getL1Wallet = () => {
   const wallet = ethers.Wallet.fromPhrase(mnemonic);
 
   // Create a provider using the wallet
-  const provider = new ethers.JsonRpcProvider(hreConfig.networks['goerli'].url); // Replace with your Infura Project ID or your preferred Ethereum node URL
+  const provider = new ethers.JsonRpcProvider(hreConfig.networks['goerli'].url);
 
   // Set the provider for the wallet
   const signer = wallet.connect(provider);
