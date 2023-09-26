@@ -48,6 +48,8 @@ To verify the values are correct, check the balance with.
 npx hardhat balance
 ```
 
+### Deposits
+
 You can bridge ETH.
 
 ```
@@ -68,6 +70,43 @@ You bridge a token with
 
 ```
 npx hardhat bridgeToken --amount 0.01 --l1token 0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6 --l2token 0x4200000000000000000000000000000000000006
+```
+
+### Withdrawals
+
+You can fetch existing withdrawals with
+
+```
+npx hardhat fetchWithdrawals
+```
+
+Withdrawals will have 4 booleans to indicate it's lifecycle.
+isReadyToProve, isProven, isReadyToFinalize, and isFinalized
+
+To initiate a native token withdrawal, start with
+
+```
+npx hardhat withdraw --amount 0.01
+```
+
+The withdrawal will enter a proposing onchain state. Once the withdrawal is proposed and messaged between layer one, the withdrawal can be verified.
+
+```
+npx hardhat proveWithdrawal --tx {your transaction hash from above}
+```
+
+Once the transaction is proven, the withdrawal has a holding period until it can be finalized. Currently in testnet, this is 12 seconds. Mainnet is 7 days.
+
+Lastly, you can finalize the transaction with
+
+```
+npx hardhat finalizeWithdrawal --tx {your transaction hash from above}
+```
+
+The same flow can be used for ERC20 tokens. Make sure that the token is supported by the bridge by checking the l2 base, base-goerli addresses and l1 ethereum, goerli addresses in the [optimism token list](https://github.com/ethereum-optimism/ethereum-optimism.github.io)
+
+```
+npx hardhat withdrawalToken --amount 0.01 --token 0x4200000000000000000000000000000000000006
 ```
 
 ## Add your token to Base
