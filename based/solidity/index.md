@@ -37,7 +37,7 @@ Solidity and Ethereum beyond Base Camp. Alchemy University is a free 7 week full
 bootcamp that starts with building on data structures through various Solidity
 development modules.
 
-[Devpill.me](Devpill.me) is a fantastic resource for learning all aspects of
+[Devpill.me](https://Devpill.me) is a fantastic resource for learning all aspects of
 development on blockchains. It covers not only Solidity/Smart Contract
 development but also Frontend, Backend and more roles within the blockchain
 ecosystem.
