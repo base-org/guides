@@ -41,7 +41,7 @@ _**Warning**: This demo requires the use of private keys in order to effectively
 
 _Depending on system settings your wallet may look different_
 
-**Open the Coinbase Wallet browser extention then click on the Settings tab**
+**Open the Coinbase Wallet browser extension then click on the Settings tab**
 
 ![Settings tab](images/enable_testnet_resize.png)
 
@@ -152,13 +152,13 @@ export WALLET_KEY=0xde9be858da4a475276426320d5e9262ecfc3ba460bfac56360bfa6c4c28b
 
 Press enter/return on your keyboard to save the value
 
-**Verify your private key have been saved:**
+**Verify your private key has been saved:**
 
 ```bash
 echo $WALLET_KEY
 ```
 
-**Sameple output:**
+**Sample output:**
 
 ```bash
 0xde9be858da4a475276426320d5e9262ecfc3ba460bfac56360bfa6c4c28b4ee0
@@ -174,7 +174,7 @@ _Note: Each account will need funds in order to deploy contracts and interact wi
 
 **Select another wallet/account**
 
-If you do not have a additional accounts click the "Add & managege wallets" button to create a new account.
+If you do not have an additional account click the "Add & manage wallets" button to create a new account.
 
 ![Select another account](images/select_wallet_resize.png)
 
@@ -190,7 +190,7 @@ Your terminal should look like this:
 export WALLET2_ADDR=
 ```
 
-**Paste the address as an environment varible with in your terminal**
+**Paste the address as an environment variable within your terminal**
 
 ```bash
 export WALLET2_ADDR=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
@@ -204,7 +204,7 @@ Press enter/return on your keyboard to save the value
 echo $WALLET2_ADDR
 ```
 
-**Sameple output:**
+**Sample output:**
 
 ```bash
 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
@@ -212,11 +212,11 @@ echo $WALLET2_ADDR
 
 **Save the private key of the currently selected account**
 
-Each account has it's own private key.
+Each account has its own private key.
 
 This wallet will be the original owner of the NFT minted later in this tutorial. You will need the private key of the currently selected wallet in order to transfer the ownership of the NFT.
 
-Refer to the [previous steps](#copy-your-private-key) for obtaining and copying your private keys and save them as an environment varible `WALLET2_KEY ` using your terminal.
+Refer to the [previous steps](#copy-your-private-key) for obtaining and copying your private keys and save them as an environment variable `WALLET2_KEY ` using your terminal.
 
 Example:
 
@@ -352,7 +352,7 @@ Token account has 12500000000000000 ETH
 
 # Congrats!
 
-Clear the private keys from your environment variables by runnning this command:
+Clear the private keys from your environment variables by running this command:
 
 ```bash
 export WALLET_KEY=nil
